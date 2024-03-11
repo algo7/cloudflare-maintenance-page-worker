@@ -16,8 +16,13 @@ export default {
 		try {
 			// Attempt to fetch from the backend
 			const backendResponse = await fetch(backendUrl, {
-				method: 'HEAD' // Use a HEAD request for efficiency 
+				method: 'HEAD', // Use a HEAD request for efficiency 
+				headers: {
+					"X-Source": "Cloudflare-Workers"
+				}
 			});
+
+			console.log('Client IP:', request.headers.get('cf-connecting-ip'));
 
 			// Backend is up
 			if (backendResponse.ok) {
@@ -37,9 +42,6 @@ export default {
 };
 
 
-addEventListener('fetch', event => {
-	event.respondWith(handleRequest(event.request))
-})
 
 function serveStatusPage() {
 	return new Response(`
