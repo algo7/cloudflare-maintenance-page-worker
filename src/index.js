@@ -49,6 +49,7 @@ export default {
 
 		} catch (error) {
 			// Error contacting backend
+			console.error(error);
 			return serveStatusPage();
 		}
 	},
