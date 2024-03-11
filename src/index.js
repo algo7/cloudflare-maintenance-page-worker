@@ -22,11 +22,22 @@ export default {
 				}
 			});
 
-			console.log('Client IP:', request.headers.get('cf-connecting-ip'));
-			console.log('Client Country:', request.headers.get('cf-ipcountry'));
-			console.log('Client City:', request.cf.city);
-			console.log('Client Region:', request.cf.region);
-			console.log('Backend Status:', backendResponse.status);
+			const logs = {
+				'Client IP': request.headers.get('cf-connecting-ip'),
+				'Client Country': request.headers.get('cf-ipcountry'),
+				'Client City': request.cf.city,
+				'Client Region': request.cf.region,
+				'Backend Status': backendResponse.status,
+				'Time': new Date().toISOString(),
+			};
+
+
+			// Log to console
+			console.log(logs);
+
+			// Write to KV
+			await env.NAMESPACE.put('logs', JSON.stringify(logs));
+
 
 			// Backend is up
 			if (backendResponse.ok) {
