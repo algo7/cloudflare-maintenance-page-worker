@@ -11,17 +11,16 @@
 export default {
 	async fetch(request, env, ctx) {
 
-		const backendUrl = 'https://scraper.algo7.tools';
-
 		try {
 			// Attempt to fetch from the backend
-			const backendResponse = await fetch(backendUrl, {
+			const backendResponse = await fetch(env.BACKEND_URL, {
 				method: 'HEAD', // Use a HEAD request for efficiency 
 				headers: {
 					"X-Source": "Cloudflare-Workers"
 				}
 			});
 
+			// Create a log object
 			const logs = {
 				'Client IP': request.headers.get('cf-connecting-ip'),
 				'Client Country': request.headers.get('cf-ipcountry'),
@@ -35,9 +34,12 @@ export default {
 			// Log to console
 			console.log(logs);
 
-			// Write to KV
-			await env.MAINTENANCE_PAGE_LOGGING.put(`logs-${logs.Time}`, JSON.stringify(logs));
-
+			// Write to KV. Even if the write fails, the request will still be passed to the backend
+			try {
+				await env.MAINTENANCE_PAGE_LOGGING.put(`logs-${logs.Time}`, JSON.stringify(logs));
+			} catch (kvError) {
+				console.error('KV Put failed:', kvError);
+			}
 
 
 			// Backend is up
@@ -45,13 +47,13 @@ export default {
 				return fetch(request); // Pass the request to the backend
 			} else {
 				// Backend is down
-				return serveStatusPage();
+				return serveStatusPage(env.CONTACT_EMAIL);
 			}
 
 		} catch (error) {
 			// Error contacting backend
-			console.error(error);
-			return serveStatusPage();
+			console.error('Error contacting backend:', error);
+			return serveStatusPage(env.CONTACT_EMAIL);
 		}
 	},
 
@@ -59,8 +61,8 @@ export default {
 };
 
 
-
-function serveStatusPage() {
+// Serve a simple maintenance page
+function serveStatusPage(contactEmail) {
 	return new Response(`
 	<!doctype html>
 	<title>Site Maintenance</title>
@@ -76,7 +78,7 @@ function serveStatusPage() {
 	<article>
 		<h1>We&rsquo;ll be back soon!</h1>
 		<div>
-			<p>Sorry for the inconvenience but we&rsquo;re performing some maintenance at the moment. If you need to you can always <a href="mailto:support@algo7.tools">contact me</a>, otherwise we&rsquo;ll be back online shortly!</p>
+			<p>Sorry for the inconvenience but we&rsquo;re performing some maintenance at the moment. If you need to you can always <a href="mailto:${contactEmail}">contact me</a>, otherwise we&rsquo;ll be back online shortly!</p>
 			<p>&mdash; Algo7</p>
 		</div>
 	</article>
