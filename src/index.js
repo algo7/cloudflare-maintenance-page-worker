@@ -27,6 +27,7 @@ export default {
 				'Client City': request.cf.city,
 				'Client Region': request.cf.region,
 				'Backend Status': backendResponse.status,
+				'Request URL': request.url,
 				'Time': new Date().toISOString(),
 			};
 
