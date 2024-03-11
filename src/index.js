@@ -17,7 +17,8 @@ export default {
 				method: 'GET',
 				headers: {
 					"X-Source": "Cloudflare-Workers"
-				}
+				},
+				signal: AbortSignal.timeout(2000) // Set a timeout of 2 seconds
 			});
 
 			// Create a log object
@@ -52,8 +53,13 @@ export default {
 			}
 
 		} catch (error) {
-			// Error contacting backend
-			console.error('Error contacting backend:', error);
+			if (error.name === 'AbortError') {
+				console.error('Backend fetch timed out');
+			} else {
+				// Backend is down
+				console.error('Error contacting backend:', error);
+			}
+
 			return serveStatusPage(env.CONTACT_EMAIL);
 		}
 	},
