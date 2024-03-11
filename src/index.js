@@ -36,7 +36,7 @@ export default {
 			console.log(logs);
 
 			// Write to KV
-			await env.NAMESPACE.put('logs', JSON.stringify(logs));
+			await env.MAINTENANCE_PAGE_LOGGING.put('logs', JSON.stringify(logs));
 
 
 			// Backend is up
