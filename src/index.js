@@ -14,7 +14,7 @@ export default {
 		try {
 			// Attempt to fetch from the backend
 			const backendResponse = await fetch(env.BACKEND_URL, {
-				method: 'HEAD', // Use a HEAD request for efficiency 
+				method: 'GET',
 				headers: {
 					"X-Source": "Cloudflare-Workers"
 				}
