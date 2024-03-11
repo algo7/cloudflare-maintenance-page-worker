@@ -53,12 +53,15 @@ export default {
 			}
 
 		} catch (error) {
+
+			// Conditional logging for timeout errors
 			if (error.name === 'AbortError') {
 				console.error('Backend fetch timed out');
-			} else {
-				// Backend is down
-				console.error('Error contacting backend:', error);
 			}
+
+			// Backend is down
+			console.error('Error contacting backend:', error);
+
 
 			return serveStatusPage(env.CONTACT_EMAIL);
 		}
