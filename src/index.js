@@ -38,7 +38,7 @@ export default {
 
 			// Write to KV. Even if the write fails, the request will still be passed to the backend
 			try {
-				await env.MAINTENANCE_PAGE_LOGGING.put(`logs-${logs.Time}`, JSON.stringify(logs));
+				await env.KV_BINDING.put(`logs-${logs.Time}`, JSON.stringify(logs));
 			} catch (kvError) {
 				console.error('KV Put failed:', kvError);
 			}
